@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FastAIShield — EU AI Act Compliance Platform</title>
+<link rel="icon" type="image/svg+xml" href="fastaishield-favicon-light.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:#f8f9fb;color:#4a4a5a;line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+:root{
+  --accent-cyan:#0088aa;
+  --accent-violet:#6366f1;
+  --accent-orange:#ea580c;
+  --accent-green:#059669;
+  --accent-rose:#dc2626;
+  --surface:#ffffff;
+  --surface-raised:#f1f3f7;
+  --surface-hover:#e8eaef;
+  --border:#e0e2e8;
+  --border-light:#ccd0d8;
+  --text-primary:#111827;
+  --text-secondary:#4b5563;
+  --text-muted:#9ca3af;
+  --mono:'Space Mono',monospace;
+  --display:'Playfair Display',serif;
+  --body:'DM Sans',sans-serif;
+  --max-w:1200px;
+}
+
+.container{max-width:var(--max-w);margin:0 auto;padding:0 32px}
+.mono{font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;font-size:11px}
+.gradient-text{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gradient-text-green{background:linear-gradient(135deg,var(--accent-green),#0d9668);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gradient-text-shield{background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.3}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 32px;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.topbar-logo svg{width:28px;height:28px}
+.topbar-logo span{font-weight:700;font-size:17px;color:var(--text-primary);letter-spacing:-.3px}
+.topbar-logo .foundry{font-weight:400;color:var(--text-muted);font-size:12px;margin-left:2px}
+.topbar-nav{display:flex;gap:32px;align-items:center}
+.topbar-nav a{font-size:13px;color:var(--text-secondary);transition:color .2s}
+.topbar-nav a:hover{color:var(--text-primary)}
+.topbar-cta{font-size:12px;font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;
+  padding:8px 20px;border:1px solid var(--accent-green);color:var(--accent-green);border-radius:6px;transition:all .2s}
+.topbar-cta:hover{background:var(--accent-green);color:#fff}
+
+.hero{padding:180px 0 120px;position:relative;text-align:center;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+  width:800px;height:800px;background:radial-gradient(circle,rgba(5,150,105,.06) 0%,rgba(0,136,170,.03) 40%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 8px;
+  background:var(--surface);border:1px solid var(--border);border-radius:100px;margin-bottom:32px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 8px var(--accent-green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero-badge span{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text-secondary);text-transform:uppercase}
+.hero h1{font-family:var(--display);font-size:clamp(42px,6vw,72px);font-weight:800;color:var(--text-primary);line-height:1.1;margin-bottom:24px;letter-spacing:-1px}
+.hero h1 em{font-style:italic;background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;padding:4px 0;display:inline-block;line-height:1.2}
+.hero-sub{font-size:18px;color:var(--text-secondary);max-width:680px;margin:0 auto 48px;line-height:1.8;font-weight:300}
+.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--text-primary)}
+.hero-stat .label{font-size:12px;color:var(--text-muted);margin-top:4px}
+
+section{padding:100px 0;position:relative}
+section::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.sec-label{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:24px;height:1px}
+.sec-label.cyan{color:var(--accent-cyan)}.sec-label.cyan::before{background:var(--accent-cyan)}
+.sec-label.violet{color:var(--accent-violet)}.sec-label.violet::before{background:var(--accent-violet)}
+.sec-label.orange{color:var(--accent-orange)}.sec-label.orange::before{background:var(--accent-orange)}
+.sec-label.green{color:var(--accent-green)}.sec-label.green::before{background:var(--accent-green)}
+.sec-label.rose{color:var(--accent-rose)}.sec-label.rose::before{background:var(--accent-rose)}
+.sec-title{font-family:var(--display);font-size:clamp(28px,4vw,42px);font-weight:800;color:var(--text-primary);line-height:1.2;margin-bottom:16px;letter-spacing:-.5px}
+.sec-desc{font-size:16px;color:var(--text-secondary);max-width:560px;line-height:1.8;margin-bottom:48px;font-weight:300}
+
+.card-grid{display:grid;gap:16px}
+.card-grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.card-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.card-grid.cols-2,.card-grid.cols-3,.card-grid.cols-4{grid-template-columns:1fr}}
+
+.fcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden;transition:border-color .3s,transform .2s,box-shadow .3s;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.fcard:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.fcard-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:20px}
+.fcard-icon.cyan{background:rgba(0,136,170,.06);border:1px solid rgba(0,136,170,.12)}
+.fcard-icon.violet{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.12)}
+.fcard-icon.orange{background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12)}
+.fcard-icon.green{background:rgba(5,150,105,.06);border:1px solid rgba(5,150,105,.12)}
+.fcard-icon.rose{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.12)}
+.fcard h3{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.fcard p{font-size:13.5px;color:var(--text-secondary);line-height:1.7}
+.fcard .tag{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-top:16px;display:inline-block}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.split.reverse{direction:rtl}.split.reverse>*{direction:ltr}
+@media(max-width:900px){.split{grid-template-columns:1fr;gap:40px}.split.reverse{direction:ltr}}
+
+.metrics-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin:48px 0}
+.metric{background:var(--surface);padding:32px;text-align:center}
+.metric .val{font-family:var(--display);font-size:32px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
+.metric .lbl{font-size:12px;color:var(--text-muted)}
+@media(max-width:700px){.metrics-bar{grid-template-columns:repeat(2,1fr)}}
+
+.features-list{list-style:none;margin-top:28px}
+.features-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:12px}
+.features-list li:last-child{border-bottom:none}
+.features-list .check{width:18px;height:18px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.check.cyan{background:rgba(0,136,170,.08);color:var(--accent-cyan);border:1px solid rgba(0,136,170,.15)}
+.check.violet{background:rgba(99,102,241,.08);color:var(--accent-violet);border:1px solid rgba(99,102,241,.15)}
+.check.orange{background:rgba(234,88,12,.08);color:var(--accent-orange);border:1px solid rgba(234,88,12,.15)}
+.check.green{background:rgba(5,150,105,.08);color:var(--accent-green);border:1px solid rgba(5,150,105,.15)}
+
+.hero-feature-visual{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2px;overflow:hidden;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.hero-feature-visual::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(5,150,105,.06),transparent,rgba(0,136,170,.06));z-index:1;pointer-events:none}
+.visual-inner{background:var(--surface-raised);border-radius:18px;padding:32px;min-height:360px;display:flex;align-items:center;justify-content:center;position:relative}
+
+.arch-diagram{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;margin-top:48px;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.arch-diagram::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(5,150,105,.04),transparent);pointer-events:none}
+.arch-layers{display:flex;flex-direction:column;gap:12px}
+.arch-layer{display:flex;align-items:stretch;gap:12px}
+.arch-block{flex:1;padding:20px 24px;border-radius:12px;border:1px solid;position:relative}
+.arch-block .block-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.arch-block .block-title{font-size:14px;font-weight:700;color:var(--text-primary)}
+.arch-block .block-items{font-size:11.5px;color:var(--text-secondary);margin-top:6px;line-height:1.6}
+.arch-block.cyan{border-color:rgba(0,136,170,.2);background:rgba(0,136,170,.03)}.arch-block.cyan .block-label{color:var(--accent-cyan)}
+.arch-block.violet{border-color:rgba(99,102,241,.2);background:rgba(99,102,241,.03)}.arch-block.violet .block-label{color:var(--accent-violet)}
+.arch-block.orange{border-color:rgba(234,88,12,.2);background:rgba(234,88,12,.03)}.arch-block.orange .block-label{color:var(--accent-orange)}
+.arch-block.green{border-color:rgba(5,150,105,.2);background:rgba(5,150,105,.03)}.arch-block.green .block-label{color:var(--accent-green)}
+.arch-block.rose{border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.03)}.arch-block.rose .block-label{color:var(--accent-rose)}
+.arch-block.neutral{border-color:var(--border);background:var(--surface-raised)}.arch-block.neutral .block-label{color:var(--text-muted)}
+.arch-connector{text-align:center;padding:8px 0;color:var(--text-muted);font-size:18px;letter-spacing:4px}
+
+.lifecycle{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;margin:32px 0}
+.lc-step{padding:10px 20px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;color:var(--text-primary);border:1px solid;min-width:90px}
+.lc-arrow{color:var(--text-muted);font-size:16px}
+.lc-step.s1{background:rgba(5,150,105,.06);border-color:rgba(5,150,105,.15)}
+.lc-step.s2{background:rgba(0,136,170,.06);border-color:rgba(0,136,170,.15)}
+.lc-step.s3{background:rgba(99,102,241,.06);border-color:rgba(99,102,241,.15)}
+.lc-step.s4{background:rgba(234,88,12,.06);border-color:rgba(234,88,12,.15)}
+.lc-step.s5{background:rgba(220,38,38,.06);border-color:rgba(220,38,38,.15)}
+
+/* Timeline table */
+.timeline-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:32px 0}
+.timeline-table th{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:14px 20px;background:var(--surface-raised);text-align:left;border-bottom:1px solid var(--border)}
+.timeline-table td{padding:14px 20px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+.timeline-table tr:last-child td{border-bottom:none}
+.timeline-table .date-cell{font-family:var(--mono);font-size:12px;color:var(--text-primary);font-weight:600;white-space:nowrap}
+.timeline-table .fine-val{font-family:var(--mono);font-size:13px;font-weight:700}
+.fine-red{color:var(--accent-rose)}.fine-orange{color:var(--accent-orange)}.fine-yellow{color:#d97706}
+
+/* Role hierarchy */
+.role-tree{display:flex;flex-direction:column;gap:8px;max-width:620px;margin:0 auto}
+.role-node{padding:14px 20px;border-radius:10px;border:1px solid;display:flex;align-items:center;gap:12px}
+.role-node .role-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.role-node .role-label{font-size:13px;font-weight:600;color:var(--text-primary)}
+.role-node .role-meta{font-size:11px;color:var(--text-muted)}
+.role-node.leadership{border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.03)}.role-node.leadership .role-icon{background:rgba(220,38,38,.1);color:var(--accent-rose)}
+.role-node.operational{border-color:rgba(99,102,241,.2);background:rgba(99,102,241,.03)}.role-node.operational .role-icon{background:rgba(99,102,241,.1);color:var(--accent-violet)}
+.role-node.supporting{border-color:rgba(0,136,170,.2);background:rgba(0,136,170,.03)}.role-node.supporting .role-icon{background:rgba(0,136,170,.1);color:var(--accent-cyan)}
+.role-node.personnel{border-color:rgba(234,88,12,.2);background:rgba(234,88,12,.03)}.role-node.personnel .role-icon{background:rgba(234,88,12,.1);color:var(--accent-orange)}
+.role-node.platform{border-color:rgba(5,150,105,.2);background:rgba(5,150,105,.03)}.role-node.platform .role-icon{background:rgba(5,150,105,.1);color:var(--accent-green)}
+
+/* Risk tier badges */
+.risk-tier{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:700}
+.risk-prohibited{background:rgba(220,38,38,.08);color:var(--accent-rose);border:1px solid rgba(220,38,38,.15)}
+.risk-high{background:rgba(234,88,12,.08);color:var(--accent-orange);border:1px solid rgba(234,88,12,.15)}
+.risk-limited{background:rgba(99,102,241,.08);color:var(--accent-violet);border:1px solid rgba(99,102,241,.15)}
+.risk-minimal{background:rgba(5,150,105,.08);color:var(--accent-green);border:1px solid rgba(5,150,105,.15)}
+
+.new-badge{display:inline-block;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:1px;background:var(--accent-green);color:#fff;padding:2px 6px;border-radius:3px;vertical-align:middle;margin-left:6px}
+
+.sec-alt{background:linear-gradient(180deg,var(--surface-raised) 0%,#f8f9fb 100%)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.animate{animation:fadeUp .6s ease-out both}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}
+
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;position:relative;transition:all .3s}
+.price-card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.price-card.featured{border-color:rgba(5,150,105,.3);box-shadow:0 4px 16px rgba(5,150,105,.08)}
+.price-card .price-name{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px}
+.price-card .price-val{font-family:var(--display);font-size:36px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
+.price-card .price-period{font-size:12px;color:var(--text-muted);margin-bottom:20px}
+.price-card .price-desc{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px}
+.price-card .price-btn{display:inline-block;padding:10px 24px;border-radius:8px;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);color:var(--text-secondary);transition:all .2s;cursor:pointer}
+.price-card .price-btn:hover{border-color:var(--accent-green);color:var(--accent-green)}
+.price-card.featured .price-btn{background:var(--accent-green);color:#fff;border-color:var(--accent-green)}
+.price-card.featured .price-btn:hover{background:#047857}
+
+.footer{padding:64px 0;text-align:center;background:var(--surface)}
+.footer-brand{font-family:var(--display);font-size:24px;font-weight:800;color:var(--text-primary);margin-bottom:8px}
+.footer-sub{font-size:13px;color:var(--text-muted);margin-bottom:32px}
+.footer-links{display:flex;justify-content:center;gap:32px;margin-bottom:24px}
+.footer-links a{font-size:13px;color:var(--text-secondary);transition:color .2s}
+.footer-links a:hover{color:var(--text-primary)}
+.footer-copy{font-size:11px;color:var(--text-muted)}
+
+/* ========== MOBILE HAMBURGER ========== */
+.topbar-toggle{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--text-primary)}
+.topbar-toggle svg{width:24px;height:24px}
+
+/* ========== TABLET (max 900px) ========== */
+@media(max-width:900px){
+  .container{padding:0 20px}
+  .topbar{padding:0 20px}
+  .topbar-nav{display:none;position:absolute;top:64px;left:0;right:0;background:var(--surface);
+    border-bottom:1px solid var(--border);flex-direction:column;padding:20px 24px;gap:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08)}
+  .topbar-nav.open{display:flex}
+  .topbar-toggle{display:block}
+  .topbar-cta{align-self:flex-start}
+
+  .hero{padding:120px 0 80px}
+  .hero-sub{font-size:16px;margin-bottom:36px}
+  .hero-stats{gap:24px}
+  .hero-stat .val{font-size:22px}
+
+  section{padding:64px 0}
+  .sec-title{font-size:28px}
+  .sec-desc{font-size:15px;margin-bottom:32px}
+
+  .arch-diagram{padding:24px;margin-top:32px;overflow-x:auto}
+  .arch-layer{flex-direction:column;gap:10px}
+  .arch-block{padding:16px}
+
+  .lifecycle{gap:3px}
+  .lc-step{padding:8px 12px;font-size:11px;min-width:auto}
+
+  .metrics-bar{grid-template-columns:repeat(2,1fr)}
+  .metric{padding:20px 16px}
+  .metric .val{font-size:24px}
+
+  .fcard{padding:24px}
+
+  .pricing-grid{grid-template-columns:1fr 1fr}
+
+  .role-tree{font-size:12px}
+  .role-node{padding:10px 14px;border-radius:8px;gap:10px}
+  .role-node .role-icon{width:28px;height:28px;font-size:12px}
+  .role-node .role-label{font-size:12px}
+  .role-node .role-meta{font-size:10px}
+
+  .topbar-logo span{font-size:15px}
+  .topbar-logo .foundry{font-size:10px}
+  .topbar-logo svg{width:24px;height:24px}
+  .topbar-inner{height:56px}
+
+  .footer-links{flex-wrap:wrap;gap:16px 24px;justify-content:center}
+  .footer-brand{font-size:20px}
+}
+
+/* ========== PHONE (max 600px) ========== */
+@media(max-width:600px){
+  .container{padding:0 16px}
+  .topbar{padding:0 16px}
+
+  .hero{padding:100px 0 60px}
+  .hero h1{font-size:32px;letter-spacing:-.5px}
+  .hero-sub{font-size:15px;line-height:1.7;margin-bottom:28px}
+  .hero-stats{flex-direction:column;gap:16px}
+  .hero-stat .val{font-size:20px}
+  .hero-badge span{font-size:9px;letter-spacing:1.5px}
+
+  section{padding:48px 0}
+  .sec-label{font-size:10px;letter-spacing:2px}
+  .sec-title{font-size:24px}
+  .sec-desc{font-size:14px;margin-bottom:24px}
+
+  .card-grid{gap:12px}
+  .fcard{padding:20px;border-radius:12px}
+  .fcard h3{font-size:15px}
+  .fcard p{font-size:13px}
+  .fcard-icon{width:38px;height:38px;font-size:17px;margin-bottom:14px}
+
+  .split{gap:32px}
+  .features-list li{font-size:13px;gap:8px;padding:8px 0}
+  .check{width:16px;height:16px;font-size:9px}
+
+  .arch-diagram{padding:16px;border-radius:12px}
+  .arch-block .block-title{font-size:13px}
+  .arch-block .block-items{font-size:10.5px}
+  .arch-block .block-label{font-size:8px}
+
+  .visual-inner{padding:20px 16px}
+
+  .lifecycle{flex-wrap:wrap;gap:6px}
+  .lc-step{flex:1;min-width:70px;padding:8px 10px;font-size:10px}
+  .lc-arrow{display:none}
+
+  .metrics-bar{grid-template-columns:1fr 1fr;border-radius:12px}
+  .metric{padding:16px 12px}
+  .metric .val{font-size:20px}
+  .metric .lbl{font-size:10px}
+
+  .pricing-grid{grid-template-columns:1fr}
+
+  .timeline-table{font-size:12px}
+  .timeline-table th,.timeline-table td{padding:10px 14px}
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-logo">
+      <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="28" fill="#e8faf4"/>
+        <path d="M60 12L96 28V60C96 82 80 96 60 104C40 96 24 82 24 60V28L60 12Z" fill="#f0fdf8" stroke="#0d9668" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M42 58L54 70L78 44" stroke="#0d9668" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span>FastAIShield<span class="foundry"> by FastAIFoundry</span></span>
+    </div>
+    <button class="topbar-toggle" onclick="document.querySelector('.topbar-nav').classList.toggle('open')" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="topbar-nav">
+      <a href="#challenge">Regulation</a>
+      <a href="#modules">Modules</a>
+      <a href="#risk-tiers">Risk Tiers</a>
+      <a href="#roles">Roles</a>
+      <a href="#integration">Integration</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" class="topbar-cta">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge animate"><div class="dot"></div><span>EU AI Act Compliance Platform</span></div>
+    <h1 class="animate d1">Classify, Govern &amp; Prove<br><em>AI Compliance</em></h1>
+    <p class="hero-sub animate d2">The compliance platform for Chief Risk Officers, Chief AI Officers, and compliance teams navigating the EU AI Act. System inventory, risk management, technical documentation, human oversight, conformity assessment, and regulatory intelligence — delivered as SaaS, ready in minutes.</p>
+    <div class="hero-stats animate d3">
+      <div class="hero-stat"><div class="val">14</div><div class="label">Compliance Phases</div></div>
+      <div class="hero-stat"><div class="val">19</div><div class="label">Accountability Roles</div></div>
+      <div class="hero-stat"><div class="val">4 Tiers</div><div class="label">Risk Classification</div></div>
+      <div class="hero-stat"><div class="val">€35M</div><div class="label">Max Fine Exposure</div></div>
+      <div class="hero-stat"><div class="val">SaaS</div><div class="label">Cloud Platform</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ THE REGULATORY CHALLENGE ============ -->
+<section id="challenge">
+  <div class="container">
+    <div class="sec-label rose">The Regulatory Challenge</div>
+    <div class="sec-title">The EU AI Act is here. Compliance is not optional.</div>
+    <div class="sec-desc">Regulation (EU) 2024/1689 is the world's first comprehensive legal framework for AI. It imposes binding obligations on every organisation that develops, deploys, imports, or distributes AI systems within the EU market.</div>
+
+    <div class="card-grid cols-2">
+      <div class="fcard" style="grid-row:span 2">
+        <div class="fcard-icon rose">⏰</div>
+        <h3>Enforcement Timeline</h3>
+        <p style="margin-bottom:16px">The clock is running. Key milestones are already past, with the most impactful obligations taking effect in 2026.</p>
+        <table class="timeline-table" style="margin:0">
+          <tr><th>Date</th><th>Milestone</th></tr>
+          <tr><td class="date-cell">Aug 1, 2024</td><td>AI Act entered into force</td></tr>
+          <tr><td class="date-cell">Feb 2, 2025</td><td>Prohibited practices + AI literacy obligations apply</td></tr>
+          <tr><td class="date-cell">Aug 2, 2025</td><td>GPAI obligations + governance provisions apply</td></tr>
+          <tr><td class="date-cell" style="color:var(--accent-rose)">Aug 2, 2026</td><td><strong style="color:var(--text-primary)">High-risk AI system requirements apply (Annex III)</strong></td></tr>
+          <tr><td class="date-cell">Aug 2, 2027</td><td>High-risk AI as product safety components (Annex I)</td></tr>
+        </table>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon rose">💰</div>
+        <h3>Penalty Structure</h3>
+        <p style="margin-bottom:16px">Non-compliance exposes organisations to fines scaled to the severity of violations.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;padding:12px 14px;background:rgba(220,38,38,.04);border:1px solid rgba(220,38,38,.1);border-radius:8px;align-items:center"><span style="font-size:12px;color:var(--text-secondary)">Prohibited practices</span><span class="fine-val fine-red">€35M / 7%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px 14px;background:rgba(234,88,12,.04);border:1px solid rgba(234,88,12,.1);border-radius:8px;align-items:center"><span style="font-size:12px;color:var(--text-secondary)">High-risk system obligations</span><span class="fine-val fine-orange">€15M / 3%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:12px 14px;background:rgba(217,119,6,.04);border:1px solid rgba(217,119,6,.1);border-radius:8px;align-items:center"><span style="font-size:12px;color:var(--text-secondary)">Incorrect information</span><span class="fine-val fine-yellow">€7.5M / 1%</span></div>
+        </div>
+        <p style="margin-top:12px;font-size:11px;color:var(--text-muted)">Fines are the maximum of EUR amount or % of global annual turnover. SMEs and startups subject to proportionally lower caps.</p>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon rose">🧩</div>
+        <h3>The Complexity Problem</h3>
+        <p>Track AI systems across multiple risk tiers. Manage different obligations for different value chain roles. Maintain documentation that auto-populates across modules. Run continuous risk management with trigger-based reviews. Prove everything to regulators. FastAIShield solves this in a single platform.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RISK TIERS ============ -->
+<section id="risk-tiers" class="sec-alt">
+  <div class="container">
+    <div class="sec-label green">Risk Classification Engine</div>
+    <div class="sec-title">Four Risk Tiers. One Decision Tree.</div>
+    <div class="sec-desc">Every AI system is classified using an Article 6 guided decision tree. FastAIShield automates classification and continuously monitors for prohibited practices.</div>
+
+    <div class="card-grid cols-4">
+      <div class="fcard" style="border-color:rgba(220,38,38,.2);border-top:3px solid var(--accent-rose)">
+        <div style="margin-bottom:16px"><span class="risk-tier risk-prohibited">Prohibited</span></div>
+        <h3>Unacceptable Risk</h3>
+        <p style="margin-bottom:12px">Social scoring, manipulative AI, real-time remote biometric identification in public spaces, emotion recognition in workplace/education.</p>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-rose);letter-spacing:1px">BANNED · ART. 5</div>
+      </div>
+      <div class="fcard" style="border-color:rgba(234,88,12,.2);border-top:3px solid var(--accent-orange)">
+        <div style="margin-bottom:16px"><span class="risk-tier risk-high">High-Risk</span></div>
+        <h3>Annex III + Annex I</h3>
+        <p style="margin-bottom:12px">Credit scoring, recruitment AI, medical diagnostics, critical infrastructure, law enforcement, education assessment.</p>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-orange);letter-spacing:1px">FULL COMPLIANCE · ART. 6</div>
+      </div>
+      <div class="fcard" style="border-color:rgba(99,102,241,.2);border-top:3px solid var(--accent-violet)">
+        <div style="margin-bottom:16px"><span class="risk-tier risk-limited">Limited-Risk</span></div>
+        <h3>Transparency Only</h3>
+        <p style="margin-bottom:12px">Chatbots, deepfake generators, emotion recognition systems (non-prohibited), biometric categorisation.</p>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-violet);letter-spacing:1px">DISCLOSE AI · ART. 50</div>
+      </div>
+      <div class="fcard" style="border-color:rgba(5,150,105,.2);border-top:3px solid var(--accent-green)">
+        <div style="margin-bottom:16px"><span class="risk-tier risk-minimal">Minimal-Risk</span></div>
+        <h3>No Mandatory Obligations</h3>
+        <p style="margin-bottom:12px">Spam filters, AI-enhanced video games, inventory management. Voluntary codes of conduct encouraged.</p>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent-green);letter-spacing:1px">VOLUNTARY · ART. 95</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPLIANCE LIFECYCLE ============ -->
+<section>
+  <div class="container" style="text-align:center">
+    <div class="sec-label green" style="justify-content:center">Compliance Lifecycle</div>
+    <div class="sec-title" style="margin:0 auto 16px">10 Phases. Full Regulatory Coverage.</div>
+    <div class="sec-desc" style="margin:0 auto 48px;max-width:640px;text-align:center">FastAIShield manages the entire EU AI Act compliance lifecycle — from initial system discovery through post-market monitoring and regulatory reporting.</div>
+    <div class="lifecycle">
+      <div class="lc-step s1">📋 Inventory</div><div class="lc-arrow">→</div>
+      <div class="lc-step s2">⚠ Risk</div><div class="lc-arrow">→</div>
+      <div class="lc-step s3">📄 Docs</div><div class="lc-arrow">→</div>
+      <div class="lc-step s4">🔍 Data</div><div class="lc-arrow">→</div>
+      <div class="lc-step s5">👁 Oversight</div>
+    </div>
+    <div class="lifecycle" style="margin-top:8px">
+      <div class="lc-step s1">✓ Conformity</div><div class="lc-arrow">→</div>
+      <div class="lc-step s2">🛡 GPAI</div><div class="lc-arrow">→</div>
+      <div class="lc-step s3">📡 Monitoring</div><div class="lc-arrow">→</div>
+      <div class="lc-step s4">🤝 Stakeholders</div><div class="lc-arrow">→</div>
+      <div class="lc-step s5">📊 Intelligence</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CORE MODULES ============ -->
+<section id="modules" class="sec-alt">
+  <div class="container">
+    <div class="sec-label green">Core Compliance Modules</div>
+    <div class="sec-title">Every Obligation. Every Article.</div>
+    <div class="sec-desc">10 compliance modules covering every regulatory requirement from system inventory through regulatory intelligence. Each maps directly to specific EU AI Act articles.</div>
+
+    <div class="card-grid cols-2">
+      <div class="fcard">
+        <div class="fcard-icon green">📋</div>
+        <h3>AI System Inventory &amp; Classification</h3>
+        <p>Register every AI system, classify into risk tiers using the Article 6 decision tree, detect shadow AI with automated discovery, and monitor for prohibited practices in real time.</p>
+        <div class="tag">Art. 3, 5, 6 · Annex I / III · 7 pages</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon green">⚠</div>
+        <h3>Risk Management System</h3>
+        <p>Continuous risk management with risk registers, mitigation planning, Fundamental Rights Impact Assessments, and a control library mapped to ISO 42001 and NIST AI RMF.</p>
+        <div class="tag">Art. 9 · 7 pages</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan">📄</div>
+        <h3>Technical Documentation &amp; Records</h3>
+        <p>Annex IV technical documentation builder with 9 standard sections, auto-population from other phases, immutable event logging with hash chaining, and 10-year retention enforcement.</p>
+        <div class="tag">Art. 11, 12, 18, 19 · Annex IV · 8 pages</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan">🔬</div>
+        <h3>Data Governance &amp; Bias Management</h3>
+        <p>Dataset registry with full lineage, automated bias scanning across protected characteristics, fairness metrics (statistical parity, equalized odds, calibration), and data quality scoring.</p>
+        <div class="tag">Art. 10 · 8 pages</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon violet">👁</div>
+        <h3>Human Oversight &amp; Transparency</h3>
+        <p>Oversight policies per AI system with configurable review levels, transparency disclosure management for Article 50 obligations, and AI literacy tracking with 5 proficiency tiers.</p>
+        <div class="tag">Art. 13, 14, 50, 4 · 5 pages</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon violet">✓</div>
+        <h3>Conformity Assessment &amp; QMS</h3>
+        <p>Quality Management System framework builder covering all 13 Article 17 elements, conformity assessment workflows for Annex VI and Annex VII, EU Declaration of Conformity generator, and CE marking.</p>
+        <div class="tag">Art. 17, 43, 47-49 · Annex VI / VII · 6 pages</div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-4" style="margin-top:16px">
+      <div class="fcard">
+        <div class="fcard-icon orange">🛡</div>
+        <h3>GPAI &amp; Security</h3>
+        <p>GPAI model inventory, systemic risk assessment, red teaming, accuracy benchmarking, robustness testing, and AI-specific cybersecurity threat modelling.</p>
+        <div class="tag">Art. 15, 51-56</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon orange">📡</div>
+        <h3>Post-Market Monitoring</h3>
+        <p>Continuous monitoring dashboards, drift detection (data, concept, performance, fairness), serious incident workflows with 15-day notification deadlines, and corrective actions.</p>
+        <div class="tag">Art. 72, 73, 20</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon orange">🤝</div>
+        <h3>Multi-Stakeholder</h3>
+        <p>Provider, deployer, importer, and distributor compliance workflows, deployer onboarding, worker notifications, right to explanation, and role change detection.</p>
+        <div class="tag">Art. 16, 22-27</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon rose">📊</div>
+        <h3>Regulatory Intelligence</h3>
+        <p>Standards tracking, compliance scorecard, board report generator, financial impact calculator, Shield Agent AI assistant, and integration marketplace.</p>
+        <div class="tag">Art. 113, 62, 57</div>
+      </div>
+    </div>
+
+    <div class="metrics-bar">
+      <div class="metric"><div class="val">10-Year</div><div class="lbl">Audit Trail Retention</div></div>
+      <div class="metric"><div class="val">15-Day</div><div class="lbl">Incident Response SLA</div></div>
+      <div class="metric"><div class="val">100%</div><div class="lbl">Annex III Domain Coverage</div></div>
+      <div class="metric"><div class="val">Board-Ready</div><div class="lbl">Compliance Reporting</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLATFORM ARCHITECTURE ============ -->
+<section>
+  <div class="container">
+    <div class="sec-label green">Platform Architecture</div>
+    <div class="sec-title">One Dashboard. Complete Regulatory Visibility.</div>
+    <div class="sec-desc">FastAIShield gives your Chief Risk Officer, Chief AI Officer, and compliance team a single pane of glass across the entire AI portfolio — from risk posture to regulator-ready documentation.</div>
+    <div class="card-grid cols-3">
+      <div class="fcard">
+        <div class="fcard-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/><circle cx="12" cy="7" r="2" fill="rgba(5,150,105,.2)"/></svg></div>
+        <h3>Compliance Scorecard</h3>
+        <p>A 0–100 score across all compliance dimensions — updated continuously as your team works. Know your exact regulatory exposure at any moment, not just during audits.</p>
+        <div class="tag">Real-time posture</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <h3>Regulator-Ready at All Times</h3>
+        <p>Technical documentation, risk assessments, and conformity declarations are always up-to-date and packaged for authority submission. No scramble when regulators come calling.</p>
+        <div class="tag">Always audit-ready</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 12V9"/><path d="M11 12V7"/><path d="M15 12v-2"/></svg></div>
+        <h3>Board-Ready Reporting</h3>
+        <p>Generate executive compliance reports in PDF, PPTX, or DOCX — with fine exposure modelling, risk heatmaps, and remediation progress. Built for the boardroom, not the server room.</p>
+        <div class="tag">C-suite visibility</div>
+      </div>
+    </div>
+    <div class="card-grid cols-3" style="margin-top:16px">
+      <div class="fcard">
+        <div class="fcard-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0088aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3" fill="rgba(0,136,170,.15)"/><circle cx="18" cy="6" r="3" fill="rgba(0,136,170,.15)"/><circle cx="12" cy="18" r="3" fill="rgba(0,136,170,.15)"/><path d="M8.5 7.5 10.5 16"/><path d="M15.5 7.5 13.5 16"/><path d="M9 6h6"/></svg></div>
+        <h3>Cross-Module Auto-Population</h3>
+        <p>Data captured in one module flows automatically to others. Register an AI system once — risk assessments, documentation, and oversight policies reference it everywhere. No duplicate data entry.</p>
+        <div class="tag">Single source of truth</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0088aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m15.5 7.5 2.8-2.8"/><path d="M20 12h-4"/><path d="m15.5 16.5 2.8 2.8"/><path d="M12 18v4"/><path d="m4.9 19.1 2.8-2.8"/><path d="M4 12h4"/><path d="m4.9 4.9 2.8 2.8"/><circle cx="12" cy="12" r="4" fill="rgba(0,136,170,.1)"/><text x="10" y="15" font-size="8" font-weight="700" fill="#0088aa" font-family="sans-serif">€</text></svg></div>
+        <h3>Fine Exposure Calculator</h3>
+        <p>Model your financial exposure based on current compliance gaps. See exactly what non-compliance costs — by AI system, by violation category, by risk tier. Prioritise remediation by business impact.</p>
+        <div class="tag">Financial risk modelling</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0088aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg></div>
+        <h3>Deadline &amp; Milestone Alerts</h3>
+        <p>Countdown calendars for every enforcement milestone, conformity deadline, and incident notification window. Automated alerts ensure nothing slips through the cracks.</p>
+        <div class="tag">Never miss a deadline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 19-ROLE ARCHITECTURE ============ -->
+<section id="roles" class="sec-alt">
+  <div class="container">
+    <div class="split">
+      <div>
+        <div class="sec-label violet">Accountability Framework</div>
+        <div class="sec-title">19 Roles. Real Accountability.</div>
+        <div class="sec-desc" style="margin-bottom:0">Traditional admin/editor/viewer RBAC cannot capture the EU AI Act's accountability requirements. FastAIShield uses a 19-role architecture across 4 categories, where each role exists because the Act requires it.</div>
+        <ul class="features-list">
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Platform Roles (3)</strong> — Control login, navigation, and domain management. IT layer with no inherent compliance authority</span></li>
+          <li><span class="check violet">✓</span><span><strong style="color:var(--text-primary)">Compliance Roles (8)</strong> — Define compliance actions with inheritance hierarchy. Leadership, Operational, and Supporting tiers</span></li>
+          <li><span class="check orange">✓</span><span><strong style="color:var(--text-primary)">Personnel Designations (3)</strong> — Track operational staff performing regulated activities. Per-AI-system assignments</span></li>
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">Value Chain Roles (5)</strong> — Provider, Deployer, Importer, Distributor, Authorized Representative — activating different compliance workflows per AI system</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="role-tree">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-rose);margin-bottom:4px">Leadership Tier</div>
+          <div class="role-node leadership"><div class="role-icon">👑</div><div><div class="role-label">AI Governance Owner</div><div class="role-meta">Art. 17(m) · Sign declarations · Approve conformity · Level 100</div></div></div>
+          <div class="role-node leadership" style="margin-left:16px"><div class="role-icon">📡</div><div><div class="role-label">Authority Liaison</div><div class="role-meta">Art. 21, 73 · Regulatory communications · Level 90</div></div></div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-violet);margin:12px 0 4px">Operational Tier</div>
+          <div class="role-node operational" style="margin-left:32px"><div class="role-icon">📋</div><div><div class="role-label">Compliance Officer</div><div class="role-meta">Art. 9, 11, 17, 72 · Risk, docs, QMS, PMM · Level 80</div></div></div>
+          <div class="role-node operational" style="margin-left:48px"><div class="role-icon">👁</div><div><div class="role-label">Human Oversight Manager</div><div class="role-meta">Art. 14, 26(2) · Oversight policies · Level 70</div></div></div>
+          <div class="role-node operational" style="margin-left:48px"><div class="role-icon">🔬</div><div><div class="role-label">Data Governance Lead</div><div class="role-meta">Art. 10 · Datasets, bias, quality · Level 70</div></div></div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-cyan);margin:12px 0 4px">Supporting Tier</div>
+          <div class="role-node supporting" style="margin-left:64px"><div class="role-icon">✎</div><div><div class="role-label">Contributor / Auditor / Viewer</div><div class="role-meta">Scoped write · Full read · Dashboard access · Levels 10–20</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KEY CAPABILITIES DEEP DIVE ============ -->
+<section>
+  <div class="container">
+    <div class="split">
+      <div>
+        <div class="sec-label green">System Inventory</div>
+        <div class="sec-title">Find, Classify, and Monitor every AI System.</div>
+        <div class="sec-desc" style="margin-bottom:0">The foundation of compliance. Register, classify, and continuously monitor every AI system in the organisation — including shadow AI discovered automatically.</div>
+        <ul class="features-list">
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Full Lifecycle Tracking</strong> — Development, testing, production, retired — complete status management per AI system</span></li>
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Classification Wizard</strong> — Guided Article 6 decision tree walks users through risk tier assignment step-by-step</span></li>
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Prohibited Practices Scanner</strong> — Automated detection of Article 5 violations: social scoring, manipulative AI, real-time biometrics</span></li>
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Shadow AI Discovery</strong> — Scanning framework that discovers undocumented AI systems across your technology estate</span></li>
+          <li><span class="check green">✓</span><span><strong style="color:var(--text-primary)">Executive Dashboard</strong> — Risk distribution analytics with real-time compliance status across the entire AI portfolio</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcard" style="border-color:rgba(5,150,105,.15);padding:0;overflow:hidden">
+          <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">🛡</span><span style="font-size:14px;font-weight:700;color:var(--text-primary)">AI System Registry</span></div>
+            <span class="mono" style="color:var(--accent-green);font-size:9px">● 12 Systems</span>
+          </div>
+          <div style="padding:20px 24px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+              <div><div style="font-size:20px;font-weight:800;color:var(--text-primary)">3</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">High-Risk</div></div>
+              <div><div style="font-size:20px;font-weight:800;color:var(--text-primary)">5</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Limited</div></div>
+              <div><div style="font-size:20px;font-weight:800;color:var(--text-primary)">4</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Minimal</div></div>
+              <div><div style="font-size:20px;font-weight:800;color:var(--accent-green)">0</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Prohibited</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;font-family:var(--mono);letter-spacing:1px">HIGH-RISK SYSTEMS</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="padding:8px 12px;background:rgba(234,88,12,.04);border:1px solid rgba(234,88,12,.1);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">🔶 Credit Scoring Engine</span><span style="font-size:10px;color:var(--accent-orange);font-family:var(--mono)">Annex III · Production</span></div>
+              <div style="padding:8px 12px;background:rgba(234,88,12,.04);border:1px solid rgba(234,88,12,.1);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">🔶 Recruitment Screener</span><span style="font-size:10px;color:var(--accent-orange);font-family:var(--mono)">Annex III · Testing</span></div>
+              <div style="padding:8px 12px;background:rgba(234,88,12,.04);border:1px solid rgba(234,88,12,.1);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">🔶 Diagnostic Assistant</span><span style="font-size:10px;color:var(--accent-orange);font-family:var(--mono)">Annex III · Development</span></div>
+            </div>
+          </div>
+          <div style="padding:14px 24px;background:rgba(5,150,105,.04);border-top:1px solid rgba(5,150,105,.1);display:flex;align-items:center;gap:8px"><span style="font-size:10px;color:var(--accent-green);font-family:var(--mono);letter-spacing:1px">COMPLIANCE</span><span style="font-size:12px;color:var(--text-secondary)">Score: 78/100 · 2 actions required</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOCUMENTATION & DATA GOVERNANCE ============ -->
+<section class="sec-alt">
+  <div class="container">
+    <div class="split reverse">
+      <div>
+        <div class="sec-label cyan">Technical Documentation</div>
+        <div class="sec-title">Annex IV Docs that Build Themselves.</div>
+        <div class="sec-desc" style="margin-bottom:0">Technical documentation is the most labour-intensive compliance requirement. FastAIShield auto-populates documentation sections from data already captured across other compliance modules.</div>
+        <ul class="features-list">
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">9-Section Builder</strong> — Structured Annex IV documentation covering system description, design specs, data requirements, and more</span></li>
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">Auto-Population</strong> — Documentation sections pre-filled from inventory, risk, and data governance modules</span></li>
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">Immutable Audit Trail</strong> — Cryptographic hash chaining for tamper-evident event logging</span></li>
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">Retention Enforcement</strong> — Automated 10-year document and 6-month log retention per the Act's requirements</span></li>
+          <li><span class="check cyan">✓</span><span><strong style="color:var(--text-primary)">Authority Submission</strong> — Package documentation for regulatory requests in structured formats</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcard" style="border-color:rgba(0,136,170,.15);padding:0;overflow:hidden">
+          <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">📄</span><span style="font-size:14px;font-weight:700;color:var(--text-primary)">Annex IV Technical Document</span></div>
+            <span class="mono" style="color:var(--accent-cyan);font-size:9px">● Credit Scoring Engine</span>
+          </div>
+          <div style="padding:16px 24px;display:flex;flex-direction:column;gap:6px">
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§1 System Description</span><span style="font-size:10px;color:var(--accent-green);font-family:var(--mono)">✓ Approved</span></div>
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§2 Design Specifications</span><span style="font-size:10px;color:var(--accent-green);font-family:var(--mono)">✓ Approved</span></div>
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§3 Data Requirements</span><span style="font-size:10px;color:var(--accent-cyan);font-family:var(--mono)">↻ Auto-populated</span></div>
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§4 Monitoring &amp; Operation</span><span style="font-size:10px;color:var(--accent-violet);font-family:var(--mono)">◎ In Review</span></div>
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§5 Risk Management</span><span style="font-size:10px;color:var(--accent-cyan);font-family:var(--mono)">↻ Auto-populated</span></div>
+            <div style="padding:8px 12px;background:var(--surface-raised);border-radius:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-secondary)">§6–§9 Remaining</span><span style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">◌ Draft</span></div>
+          </div>
+          <div style="padding:14px 24px;background:rgba(0,136,170,.04);border-top:1px solid rgba(0,136,170,.1);display:flex;align-items:center;gap:8px"><span style="font-size:10px;color:var(--accent-cyan);font-family:var(--mono);letter-spacing:1px">AUDIT TRAIL</span><span style="font-size:12px;color:var(--text-secondary)">42 events · Hash-chained · Tamper-evident</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FASTAIAGENT INTEGRATION ============ -->
+<section id="integration">
+  <div class="container">
+    <div class="sec-label cyan">FastAIAgent Integration</div>
+    <div class="sec-title">Compliance meets Agent Execution.</div>
+    <div class="sec-desc">FastAIShield integrates directly with FastAIAgent — linking compliance records to live AI agent operations for end-to-end traceability and governance.</div>
+    <div class="card-grid cols-3">
+      <div class="fcard">
+        <div class="fcard-icon cyan">🔗</div>
+        <h3>Agent Traceability</h3>
+        <p>Link AI system compliance records to specific FastAIAgent agents and chains via <code style="font-size:12px;background:var(--surface-raised);padding:1px 5px;border-radius:3px">linked_agent_id</code> and <code style="font-size:12px;background:var(--surface-raised);padding:1px 5px;border-radius:3px">linked_chain_id</code> fields.</p>
+        <div class="tag">Cross-platform linking</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan">👤</div>
+        <h3>Single Sign-On</h3>
+        <p>Shared <code style="font-size:12px;background:var(--surface-raised);padding:1px 5px;border-radius:3px">users</code> and <code style="font-size:12px;background:var(--surface-raised);padding:1px 5px;border-radius:3px">domains</code> tables for unified authentication across both platforms. One identity, two products.</p>
+        <div class="tag">Shared Auth Layer</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon cyan">🤖</div>
+        <h3>Shield Agent</h3>
+        <p>AI-powered compliance assistant deployed as a FastAIAgent agent with a comprehensive EU AI Act knowledge base. Get AI-assisted compliance guidance within the platform.</p>
+        <div class="tag">Phase 10 · AI Assistant</div>
+      </div>
+    </div>
+    <div class="card-grid cols-2" style="margin-top:16px">
+      <div class="fcard">
+        <div class="fcard-icon green">👁</div>
+        <h3>HITL Oversight Capture</h3>
+        <p>Integrates with FastAIAgent's Human-in-the-Loop hooks to capture oversight decisions from operational AI systems in real time. Every approval, rejection, and override is logged as a compliance record.</p>
+        <div class="tag">Real-time Decision Capture</div>
+      </div>
+      <div class="fcard">
+        <div class="fcard-icon green">📊</div>
+        <h3>Agent Compliance Tracking</h3>
+        <p>Monitor compliance status of agents deployed via FastAIAgent. Track risk tier, documentation completeness, and oversight coverage for each operational agent.</p>
+        <div class="tag">Operational Compliance</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANNEX III DOMAINS ============ -->
+<section class="sec-alt">
+  <div class="container" style="text-align:center">
+    <div class="sec-label orange" style="justify-content:center">High-Risk Domains</div>
+    <div class="sec-title" style="margin:0 auto 16px">The Eight Annex III Categories.</div>
+    <div class="sec-desc" style="margin:0 auto 48px;max-width:640px;text-align:center">FastAIShield's classification engine covers all eight high-risk domains defined in Annex III of the EU AI Act. If your AI system operates in any of these areas, full compliance is required.</div>
+    <div class="card-grid cols-4" style="max-width:1100px;margin:0 auto">
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3-2 5.5-4 7.5L12 20l-3-3.5C7 14.5 5 12 5 9a7 7 0 0 1 7-7Z"/><circle cx="12" cy="9" r="2.5" fill="rgba(234,88,12,.2)"/><path d="M9 16h6"/><path d="M10 19h4"/></svg></div>
+        <h3 style="font-size:14px">Biometrics</h3><p style="font-size:12px">Identification and categorisation of natural persons</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2"/><path d="M4 10H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2"/><rect x="6" y="4" width="12" height="16" rx="2" fill="rgba(234,88,12,.08)"/><path d="M12 8v4"/><path d="M10 10h4"/><path d="M9 16h6"/></svg></div>
+        <h3 style="font-size:14px">Critical Infrastructure</h3><p style="font-size:12px">Road traffic, water, gas, heating, electricity</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M4 20V8l8-5 8 5v12"/><path d="M9 20v-6h6v6"/><rect x="9" y="9" width="6" height="4" rx="1" fill="rgba(234,88,12,.15)"/></svg></div>
+        <h3 style="font-size:14px">Education</h3><p style="font-size:12px">Access determination, assessment, monitoring</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3" fill="rgba(234,88,12,.12)"/><circle cx="17" cy="7" r="3" fill="rgba(234,88,12,.12)"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+        <h3 style="font-size:14px">Employment</h3><p style="font-size:12px">Recruitment, selection, evaluation, monitoring</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M5 7h14"/><rect x="8" y="10" width="3" height="3" rx=".5" fill="rgba(234,88,12,.15)"/><rect x="13" y="10" width="3" height="3" rx=".5" fill="rgba(234,88,12,.15)"/><rect x="8" y="15" width="3" height="3" rx=".5" fill="rgba(234,88,12,.15)"/><rect x="13" y="15" width="3" height="3" rx=".5" fill="rgba(234,88,12,.15)"/></svg></div>
+        <h3 style="font-size:14px">Essential Services</h3><p style="font-size:12px">Credit scoring, public assistance, emergency dispatch</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v5c0 5.5 3.4 10.3 8 12 4.6-1.7 8-6.5 8-12V7l-8-5Z" fill="rgba(234,88,12,.08)"/><path d="M9 12h6"/><path d="M12 9v6"/></svg></div>
+        <h3 style="font-size:14px">Law Enforcement</h3><p style="font-size:12px">Risk assessment, polygraphs, evidence evaluation</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" fill="rgba(234,88,12,.06)"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10"/><path d="M12 2a15 15 0 0 0-4 10 15 15 0 0 0 4 10"/></svg></div>
+        <h3 style="font-size:14px">Migration &amp; Border</h3><p style="font-size:12px">Application assessment, security risk, document verification</p>
+      </div>
+      <div class="fcard" style="text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:rgba(234,88,12,.06);border:1px solid rgba(234,88,12,.12);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><circle cx="12" cy="8" r="2" fill="rgba(234,88,12,.15)"/><path d="M6 21l3-9"/><path d="M18 21l-3-9"/><path d="M6 12h12"/><path d="M3 21h4"/><path d="M17 21h4"/></svg></div>
+        <h3 style="font-size:14px">Justice &amp; Democracy</h3><p style="font-size:12px">Legal research, case outcome interpretation</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="container" style="text-align:center">
+    <div class="sec-label green" style="justify-content:center">Pricing</div>
+    <div class="sec-title" style="margin:0 auto 16px">Start Free. Scale with Compliance.</div>
+    <div class="sec-desc" style="margin:0 auto 0;max-width:640px;text-align:center">From individual teams to enterprise-wide governance. Choose the tier that matches your AI portfolio.</div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div class="price-val">€0</div>
+        <div class="price-period">forever</div>
+        <div class="price-desc">AI system inventory for up to 5 systems with basic risk tier classification. Get started with compliance today.</div>
+        <div class="price-btn">Get Started</div>
+      </div>
+      <div class="price-card featured">
+        <div class="price-name">Pro</div>
+        <div class="price-val">€299</div>
+        <div class="price-period">per month</div>
+        <div class="price-desc">Full compliance suite for providers — risk management, documentation, oversight, conformity assessment, and post-market monitoring.</div>
+        <div class="price-btn">Start Pro</div>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Enterprise</div>
+        <div class="price-val">€999</div>
+        <div class="price-period">per month</div>
+        <div class="price-desc">Multi-tenant with value chain management, cross-org compliance sharing, regulatory intelligence dashboard, and dedicated onboarding.</div>
+        <div class="price-btn">Contact Sales</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ECOSYSTEM ============ -->
+<section class="sec-alt">
+  <div class="container" style="text-align:center">
+    <div class="sec-label green" style="justify-content:center">Part of the FastAIFoundry Ecosystem</div>
+    <div class="sec-title" style="margin:0 auto 16px">Govern what you Build.</div>
+    <div class="sec-desc" style="margin:0 auto 48px;max-width:640px;text-align:center">FastAIShield is the governance layer within the broader FastAIFoundry product family. Build agents in Agent. Consume them in Workspace. Ground them in context. Govern them with Shield.</div>
+    <div class="card-grid cols-4" style="max-width:1100px;margin:0 auto">
+      <div class="fcard" style="text-align:center;border-color:rgba(0,136,170,.2)">
+        <div style="margin:0 auto 16px;width:56px;height:56px"><svg width="56" height="56" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="120" rx="28" fill="#e8f6fa"/><circle cx="62" cy="56" r="30" fill="#fff" stroke="#0088aa" stroke-width="6"/><path d="M58 38L52 54H64L55 76" stroke="#006688" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <h3 class="gradient-text" style="font-size:18px">FastAIAgent</h3>
+        <p style="margin-top:8px">Build, test, deploy, and run intelligent agents with visual workflows, knowledge bases, and full lifecycle management.</p>
+        <div class="mono" style="color:var(--accent-cyan);margin-top:12px;font-size:9px">Live</div>
+      </div>
+      <div class="fcard" style="text-align:center;border-color:rgba(134,25,143,.15)">
+        <div style="margin:0 auto 16px;width:56px;height:56px"><svg width="56" height="56" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="120" rx="28" fill="#f5eaf8"/><rect x="12" y="12" width="42" height="42" rx="13" fill="#fff" stroke="#86198F" stroke-width="5" stroke-opacity=".55"/><rect x="66" y="12" width="42" height="42" rx="13" fill="#fff" stroke="#86198F" stroke-width="5" stroke-opacity=".55"/><rect x="12" y="66" width="42" height="42" rx="13" fill="#fff" stroke="#86198F" stroke-width="5" stroke-opacity=".55"/><rect x="66" y="66" width="42" height="42" rx="13" fill="#f3e0f6" stroke="#86198F" stroke-width="5.5"/><path d="M80 76L80 98L98 87Z" fill="#86198F" opacity=".85"/><circle cx="60" cy="60" r="5.5" fill="#86198F" opacity=".9"/></svg></div>
+        <h3 style="font-size:18px;color:#86198F">FastAIWorkspace</h3>
+        <p style="margin-top:8px">Thin-client consumption portal for business users. Run agents, view results, and manage work — no technical skills required.</p>
+        <div class="mono" style="color:#86198F;margin-top:12px;font-size:9px">Live</div>
+      </div>
+      <div class="fcard" style="text-align:center;border-color:rgba(99,102,241,.15)">
+        <div style="margin:0 auto 16px;width:56px;height:56px"><svg width="56" height="56" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="120" rx="28" fill="#eee8f8"/><path d="M20 52L60 30L100 52L60 74Z" fill="#dcd0ee" stroke="#6b51e0" stroke-width="4" stroke-opacity="0.3"/><path d="M20 66L60 44L100 66L60 88Z" fill="#d6c8ea" stroke="#6b51e0" stroke-width="5" stroke-opacity="0.6"/><circle cx="60" cy="66" r="14" fill="#f0ecf8" stroke="#6b51e0" stroke-width="5"/><path d="M54 62L60 56L66 62L60 68Z" stroke="#4a38b0" stroke-width="4.5" fill="none"/></svg></div>
+        <h3 style="font-size:18px;color:var(--accent-violet)">FastAIContext</h3>
+        <p style="margin-top:8px">The Business Context layer. Knowledge graphs, entity resolution, and semantic understanding that makes agents organisation-aware.</p>
+        <div class="mono" style="color:var(--text-muted);margin-top:12px;font-size:9px">Coming Soon</div>
+      </div>
+      <div class="fcard" style="text-align:center;border-color:rgba(5,150,105,.2)">
+        <div style="margin:0 auto 16px;width:56px;height:56px">
+          <svg width="56" height="56" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" rx="28" fill="#e8faf4"/>
+            <path d="M60 14L92 28V58C92 78 78 92 60 100C42 92 28 78 28 58V28L60 14Z" fill="#f0fdf8" stroke="#0d9668" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M60 22L84 34V58C84 74 72 86 60 92C48 86 36 74 36 58V34L60 22Z" fill="none" stroke="#0d9668" stroke-width="1" stroke-opacity="0.15" stroke-linejoin="round"/>
+            <path d="M44 58L54 68L76 46" stroke="#0d9668" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="60" cy="14" r="3" fill="#0d9668" opacity="0.5"/>
+          </svg>
+        </div>
+        <h3 style="font-size:18px;color:var(--accent-green)">FastAIShield</h3>
+        <p style="margin-top:8px">AI Governance and Compliance. Risk assessment, audit trails, and regulatory readiness for EU AI Act and beyond.</p>
+        <div class="mono" style="color:var(--accent-green);margin-top:12px;font-size:9px">You are here</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DESIGN PRINCIPLES ============ -->
+<section>
+  <div class="container">
+    <div class="sec-label green">Security, Trust &amp; Deployment</div>
+    <div class="sec-title">Enterprise-grade Security. Your Choice of Deployment.</div>
+    <div class="sec-desc">Available as a fully managed SaaS platform or self-hosted on your own infrastructure. Either way, your compliance data stays under your control with enterprise-grade security at every layer.</div>
+    <div class="card-grid cols-2" style="margin-bottom:16px">
+      <div class="fcard" style="border-color:rgba(5,150,105,.2);border-top:3px solid var(--accent-green)">
+        <div class="fcard-icon green">☁</div>
+        <h3>Managed SaaS</h3>
+        <p>Sign up and start classifying AI systems in minutes. We handle infrastructure, updates, and scaling — you focus on compliance. EU-hosted, GDPR-compliant, SOC 2 ready.</p>
+        <div class="tag">Recommended · Fastest time-to-compliance</div>
+      </div>
+      <div class="fcard" style="border-color:rgba(0,136,170,.2);border-top:3px solid var(--accent-cyan)">
+        <div class="fcard-icon cyan">🐳</div>
+        <h3>Self-Hosted</h3>
+        <p>Deploy on your own infrastructure with Docker Compose. 3-container architecture — frontend, API, and database. Full data sovereignty for organisations with strict data residency requirements.</p>
+        <div class="tag">Docker Compose · Air-gapped option</div>
+      </div>
+    </div>
+    <div class="card-grid cols-4">
+      <div class="fcard"><div class="fcard-icon green">🔐</div><h3>Tamper-Evident Audit Trail</h3><p>Cryptographic hash chaining ensures every compliance event is immutable and verifiable. No records can be altered retroactively.</p></div>
+      <div class="fcard"><div class="fcard-icon green">🛡</div><h3>Separation of Authority</h3><p>Platform access and compliance sign-off authority are independent. Being an admin never grants regulatory approval power.</p></div>
+      <div class="fcard"><div class="fcard-icon green">📖</div><h3>Article Traceability</h3><p>Every feature maps to specific EU AI Act articles. Your team always knows which regulation drives which requirement.</p></div>
+      <div class="fcard"><div class="fcard-icon green">🔒</div><h3>Data Sovereignty</h3><p>EU-hosted SaaS or self-hosted on your infrastructure. Compliance data never leaves your chosen jurisdiction.</p></div>
+    </div>
+    <div class="metrics-bar">
+      <div class="metric"><div class="val">EU-Hosted</div><div class="lbl">SaaS Infrastructure</div></div>
+      <div class="metric"><div class="val">FastAPI</div><div class="lbl">Async Backend</div></div>
+      <div class="metric"><div class="val">React + TS</div><div class="lbl">Modern Frontend</div></div>
+      <div class="metric"><div class="val">PostgreSQL</div><div class="lbl">Production Database</div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-brand">Fast<span class="gradient-text-green">AI</span>Foundry</div>
+    <div class="footer-sub">Build intelligent agents. Ground them in context. Govern them at scale.</div>
+    <div class="footer-links"><a href="#">Documentation</a><a href="#">GitHub</a><a href="#">API Reference</a><a href="#">Blog</a><a href="#">Contact</a></div>
+    <div class="footer-copy">© 2026 FastAIFoundry. EU-hosted SaaS or self-hosted. Your compliance data stays yours.</div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.topbar-nav a').forEach(a=>a.addEventListener('click',()=>{
+  document.querySelector('.topbar-nav').classList.remove('open');
+}));
+</script>
+</body>
+</html>
